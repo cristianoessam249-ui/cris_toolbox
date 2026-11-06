@@ -1,64 +1,53 @@
-import kivy
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.label import Label
 from kivy.core.window import Window
 
-# ضبط أبعاد الشاشة لتشبه الهاتف
-Window.size = (360, 640)
-Window.clearcolor = (0.05, 0.05, 0.05, 1) # تصميم داكن (أسود وفضي)
-
-# الشاشة الرئيسية لبرنامج CRIS TOOLBOX
-class HomeScreen(Screen):
+class ChatScreen(BoxLayout):
     def init(self, **kwargs):
-        super().init(**kwargs)
-        
-        main_layout = BoxLayout(orientation='vertical', padding=15, spacing=10)
-        
-        # الهيدر الاحترافي
-        header = Label(
-            text="[b]CRIS TOOLBOX[/b]\n[size=12][color=c0c0c0]V1.0 • By CRIS[/color][/size]",
-            markup=True,
-            font_size='22sp',
-            size_hint_y=0.15,
-            color=(0.9, 0.9, 0.9, 1)
-        )
-        main_layout.add_widget(header)
-        
-        # شبكة الأدوات التسع
-        grid = GridLayout(cols=2, spacing=10, size_hint_y=0.85)
-        
-        tools = [
-            "Device Info", "Calculator",
-            "Text Tools", "SHA256 Gen",
-            "Base64 Tool", "JSON Format",
-            "Date & Time", "Network Diag",
-            "Password Gen", "Settings"
-        ]
-        
-        for tool_name in tools:
-            btn = Button(
-                text=tool_name,
-                background_normal='',
-                background_color=(0.15, 0.15, 0.15, 1),
-                color=(0.85, 0.85, 0.85, 1),
-                font_size='14sp',
-                bold=True
-            )
-            grid.add_widget(btn)
-            
-        main_layout.add_widget(grid)
-        self.add_widget(main_layout)
+        super(ChatScreen, self).init(**kwargs)
+        self.orientation = 'vertical'
+        self.padding = 10
+        self.spacing = 10
 
-class CrisToolboxApp(App):
+        # منطقة عرض الرسائل
+        self.scroll = ScrollView(size_hint=(1, 0.85))
+        self.chat_history = BoxLayout(orientation='vertical', size_hint_y=None, spacing=5)
+        self.chat_history.bind(minimum_height=self.chat_history.setter('height'))
+        self.scroll.add_widget(self.chat_history)
+        self.add_widget(self.scroll)
+
+        # منطقة كتابة وإرسال الرسالة
+        input_layout = BoxLayout(size_hint=(1, 0.15), spacing=5)
+        self.msg_input = TextInput(hint_text='اكتب رسالتك هنا...', multiline=False)
+        send_btn = Button(text='إرسال', size_hint=(0.25, 1), background_color=(0.2, 0.6, 1, 1))
+        send_btn.bind(on_press=self.send_message)
+        
+        input_layout.add_widget(self.msg_input)
+        input_layout.add_widget(send_btn)
+        self.add_widget(input_layout)
+
+    def send_message(self, instance):
+        text = self.msg_input.text.strip()
+        if text:
+            # إضافة الرسالة للشاشة
+            msg_label = Label(
+                text=f"أنت: {text}",
+                size_hint_y=None,
+                height=40,
+                color=(1, 1, 1, 1),
+                halign='right'
+            )
+            self.chat_history.add_widget(msg_label)
+            self.msg_input.text = ''
+
+class CrisChatApp(App):
     def build(self):
-        self.title = "CRIS TOOLBOX V1.0"
-        sm = ScreenManager()
-        sm.add_widget(HomeScreen(name='home'))
-        return sm
+        self.title = 'CRIS CHAT'
+        return ChatScreen()
 
 if name == 'main':
-    CrisToolboxApp().run()
+    CrisChatApp().run()
