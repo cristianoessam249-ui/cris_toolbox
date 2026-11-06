@@ -4,7 +4,6 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label
-from kivy.core.window import Window
 
 class ChatScreen(BoxLayout):
     def init(self, **kwargs):
@@ -20,9 +19,9 @@ class ChatScreen(BoxLayout):
         self.scroll.add_widget(self.chat_history)
         self.add_widget(self.scroll)
 
-        # منطقة كتابة وإرسال الرسالة
+        # منطقة الإرسال
         input_layout = BoxLayout(size_hint=(1, 0.15), spacing=5)
-        self.msg_input = TextInput(hint_text='اكتب رسالتك هنا...', multiline=False)
+        self.msg_input = TextInput(hint_text='اكتب رسالتك...', multiline=False)
         send_btn = Button(text='إرسال', size_hint=(0.25, 1), background_color=(0.2, 0.6, 1, 1))
         send_btn.bind(on_press=self.send_message)
         
@@ -33,7 +32,6 @@ class ChatScreen(BoxLayout):
     def send_message(self, instance):
         text = self.msg_input.text.strip()
         if text:
-            # إضافة الرسالة للشاشة
             msg_label = Label(
                 text=f"أنت: {text}",
                 size_hint_y=None,
